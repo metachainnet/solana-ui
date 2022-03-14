@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  webpack: function (config, options) {
-    config.experiments = { asyncWebAssembly: true };
+  /**
+   *
+   * @param {import('next/dist/server/config-shared').NextJsWebpackConfig} config
+   */
+  webpack(config) {
+    config.experiments = {
+      asyncWebAssembly: true,
+    };
     return config;
   },
 };

@@ -1,12 +1,12 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { WalletProvider } from "../src/context/WalletContext";
+import { ChakraProvider } from "@chakra-ui/react";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <WalletProvider>
+    <ChakraProvider>
       <Component {...pageProps} />
-    </WalletProvider>
+    </ChakraProvider>
   );
 }
 
