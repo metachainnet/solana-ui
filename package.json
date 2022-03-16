@@ -9,9 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ledgerhq/hw-transport-webhid": "^6.24.1",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@solana/spl-token": "^0.2.0",
+    "@solana/web3.js": "^1.36.0",
+    "bip32": "^3.0.1",
+    "bip39": "^3.0.4",
+    "bs58": "^5.0.0",
+    "ed25519-hd-key": "^1.2.0",
     "next": "12.1.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "tiny-secp256k1": "^2.2.1",
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "17.0.21",
