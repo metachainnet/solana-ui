@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useConnection } from "../context/ConnectionContext";
 import useWalletSelector, { useWallet } from "../context/WalletContext";
 import useBalanceInfo, { Balance } from "../hooks/useBalanceInfo";
+import { useCallAsync } from "../hooks/useCallAsync";
 import useWalletPublicKeys from "../hooks/useWalletPublicKeys";
 import { abbreviateAddress } from "../lib/utils";
 import TokenIcon from "./TokenIcon";
@@ -13,13 +14,20 @@ export default function BalancesList() {
   const [publicKeys, loaded] = useWalletPublicKeys();
   const { accounts } = useWalletSelector();
 
-  return <BalancesList></BalancesList>;
+  return <BalanceListItem publicKey={publicKeys[0]} />;
 }
 
-const BalanceListItem = async ({ publicKey }: { publicKey: PublicKey }) => {
+const BalanceListItem = ({ publicKey }: { publicKey: PublicKey }) => {
   const wallet = useWallet();
-  const balanceInfo = await useBalanceInfo(publicKey);
+  const [balanceInfo, setBalanceInfo] = useState(null);
   const connection = useConnection();
+  const callAsync = useCallAsync();
+
+  callAsync(useBalanceInfo(publicKey), {
+    onSuccess: (data) => {
+      setBalanceInfo(data);
+    },
+  });
 
   // Valid states:
   //  * undefined => loading.

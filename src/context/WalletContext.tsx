@@ -58,8 +58,6 @@ export function WalletProvider({ children }) {
   const connection = useConnection();
   const [wallet, setWallet] = useState<Wallet | null>(null);
 
-  console.log(mnemonic, seed, importsEncrpytionKey, derivationPath);
-
   // todo privateKeyImports
 
   const [walletSelector, setWalletSelector] =
@@ -75,7 +73,6 @@ export function WalletProvider({ children }) {
 
   useEffect(() => {
     (async () => {
-      console.log(seed, walletSelector);
       if (!seed) {
         return null;
       }

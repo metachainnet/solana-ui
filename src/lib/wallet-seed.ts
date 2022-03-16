@@ -85,6 +85,10 @@ let unlockedMnemonicAndSeed = (async () => {
   };
 })();
 
+export function getUnlockedMnemonicAndSeed() {
+  return unlockedMnemonicAndSeed;
+}
+
 function deriveImportsEncryptionKey(seed: string) {
   return bip32.fromSeed(Buffer.from(seed, "hex")).derivePath("m/10016'/0")
     .privateKey;

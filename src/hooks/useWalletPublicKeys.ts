@@ -6,7 +6,7 @@ export default function useWalletPublicKeys() {
   const wallet = useWallet();
 
   // todo kbt token 계정 연동
-  let publicKeys = [wallet.publicKey];
+  let publicKeys = [wallet.provider.account.publicKey];
 
   // Prevent users from re-rendering unless the list of public keys actually changes
   publicKeys = useRefEqual(
