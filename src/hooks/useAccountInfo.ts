@@ -1,11 +1,15 @@
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 import { useEffect } from "react";
 import { useConnection } from "../context/ConnectionContext";
+import { useAsyncData } from "../utils/fetch-loop";
 import useRefEqual from "./useRefRequal";
 
-export default async function useAccountInfo(publicKey: PublicKey) {
+export default function useAccountInfo(publicKey: PublicKey) {
   const connection = useConnection();
-  const account = await connection.getAccountInfo(publicKey);
+  const [accountInfo, loaded] = useAsyncData(
+    async () => connection.getAccountInfo(publicKey),
+    publicKey.toBase58() // cache key
+  );
 
   useEffect(() => {
     let previousInfo: AccountInfo<Buffer> | null = null;
@@ -26,12 +30,13 @@ export default async function useAccountInfo(publicKey: PublicKey) {
 
   return [
     useRefEqual(
-      account!,
+      accountInfo!,
       (oldInfo: AccountInfo<Buffer>, newInfo: AccountInfo<Buffer>) =>
         !!oldInfo &&
         !!newInfo &&
         oldInfo.data.equals(newInfo.data) &&
         oldInfo.lamports === newInfo.lamports
     ),
+    loaded,
   ];
 }

@@ -1,11 +1,14 @@
 import { NextPage } from "next";
+import BalancesList from "../src/components/BalancesList";
 import { ConnectionProvider } from "../src/context/ConnectionContext";
-import { WalletProvider } from "../src/context/WalletContext";
+import { useWallet, WalletProvider } from "../src/context/WalletContext";
 
 const WalletPage: NextPage = () => {
   return (
     <ConnectionProvider>
-      <WalletProvider>hello</WalletProvider>
+      <WalletProvider>
+        <BalancesList />
+      </WalletProvider>
     </ConnectionProvider>
   );
 };

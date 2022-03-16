@@ -1,8 +1,7 @@
-import { ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useConnection } from "../context/ConnectionContext";
-import useWalletSelector, { useWallet } from "../context/WalletContext";
+import { useWallet } from "../context/WalletContext";
 import useBalanceInfo, { Balance } from "../hooks/useBalanceInfo";
 import { useCallAsync } from "../hooks/useCallAsync";
 import useWalletPublicKeys from "../hooks/useWalletPublicKeys";
@@ -12,28 +11,32 @@ import TokenIcon from "./TokenIcon";
 export default function BalancesList() {
   const wallet = useWallet();
   const [publicKeys, loaded] = useWalletPublicKeys();
-  const { accounts } = useWalletSelector();
 
-  return <BalanceListItem publicKey={publicKeys[0]} />;
+  if (!wallet) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <>
+      {publicKeys.map((pk) => (
+        <BalanceListItem key={pk.toString()} publicKey={pk} />
+      ))}
+    </>
+  );
 }
 
 const BalanceListItem = ({ publicKey }: { publicKey: PublicKey }) => {
   const wallet = useWallet();
-  const [balanceInfo, setBalanceInfo] = useState(null);
+  const balanceInfo = useBalanceInfo(publicKey);
   const connection = useConnection();
   const callAsync = useCallAsync();
-
-  callAsync(useBalanceInfo(publicKey), {
-    onSuccess: (data) => {
-      setBalanceInfo(data);
-    },
-  });
 
   // Valid states:
   //  * undefined => loading.
   //  * null => not found.
   //  * else => price is loaded.
   const [price, setPrice] = useState<number | null>(null);
+
   useEffect(() => {
     if (balanceInfo) {
       if (balanceInfo.tokenSymbol) {
@@ -64,23 +67,22 @@ const BalanceListItem = ({ publicKey }: { publicKey: PublicKey }) => {
 
   return (
     <>
-      <ListItem button>
-        <ListItemIcon>
-          <TokenIcon mint={mint} tokenName={tokenName} url={"test"} size={28} />
-        </ListItemIcon>
-        <div style={{ display: "flex", flex: 1 }}>
-          <ListItemText primary={tokenName} secondary={subtitle} />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column",
-            }}
-          >
-            {price}
-          </div>
+      <TokenIcon mint={mint} tokenName={tokenName} url={undefined} size={28} />
+      <div style={{ display: "flex", flex: 1 }}>
+        <p>
+          {tokenName}, {amount}, {decimals}, {tokenSymbol}
+        </p>
+        {subtitle}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          {price}
         </div>
-      </ListItem>
+      </div>
     </>
   );
 };

@@ -9,7 +9,7 @@ export default function TokenIcon({
   ...props
 }: {
   mint: string;
-  url: string;
+  url: string | undefined;
   tokenName: string;
   size: number;
 }) {
@@ -30,6 +30,8 @@ export default function TokenIcon({
       title={tokenName}
       alt={tokenName}
       onError={() => setHasError(true)}
+      width={size}
+      height={size}
       {...props}
     />
   );

@@ -11,14 +11,12 @@ export interface Balance {
   valid: boolean;
 }
 
-export default async function useBalanceInfo(
-  publicKey: PublicKey
-): Promise<Balance> {
-  let [accountInfo] = await useAccountInfo(publicKey);
+export default function useBalanceInfo(publicKey: PublicKey): Balance {
+  let [accountInfo, accountInfoLoaded] = useAccountInfo(publicKey);
   // todo token
 
   return {
-    amount: accountInfo.lamports ?? 0,
+    amount: accountInfo?.lamports ?? 0,
     decimals: 9,
     mint: null,
     owner: publicKey,
