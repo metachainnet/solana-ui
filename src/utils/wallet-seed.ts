@@ -246,3 +246,6 @@ export async function loadMnemonicAndSeed(
   );
   return { mnemonic, seed, derivationPath };
 }
+export function getUnlockedMnemonicAndSeed() {
+  return unlockedMnemonicAndSeed;
+}

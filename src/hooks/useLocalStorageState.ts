@@ -5,9 +5,11 @@ export function useLocalStorageState<T>(
   defaultState: T
 ): [T, (state: T) => void] {
   const [state, setState] = useState(() => {
-    let storedState = localStorage.getItem(key);
-    if (storedState) {
-      return JSON.parse(storedState);
+    if (typeof window !== "undefined") {
+      let storedState = localStorage.getItem(key);
+      if (storedState) {
+        return JSON.parse(storedState);
+      }
     }
     return defaultState;
   });
