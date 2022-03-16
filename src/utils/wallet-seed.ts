@@ -4,10 +4,18 @@ import bs58 from "bs58";
 import { BIP32Factory } from "bip32";
 import * as ecc from "tiny-secp256k1";
 import EventEmitter from "events";
+import { useEffect, useState } from "react";
 
 export type mnemonicAndSeedType = {
   mnemonic: string;
   seed: string;
+};
+
+export type unlockedmnemonicAndSeedType = {
+  mnemonic?: string | null;
+  seed?: string | null;
+  importsEncryptionKey?: string | null;
+  derivationPath?: string | null;
 };
 
 export const DERIVATION_PATH = {
@@ -17,7 +25,7 @@ export const DERIVATION_PATH = {
   bip44Root: "bip44Root", // Ledger only.
 };
 
-const EMPTY_MNEMONIC = {
+const EMPTY_MNEMONIC: unlockedmnemonicAndSeedType = {
   mnemonic: null,
   seed: null,
   importsEncryptionKey: null,
@@ -45,6 +53,38 @@ export const walletSeedChanged = new EventEmitter();
 export function normalizeMnemonic(mnemonic: string) {
   return mnemonic.trim().split(/\s+/g).join(" ");
 }
+
+export function useHasLockedMnemonicAndSeed() {
+  const [unlockedMnemonic, loading] = useUnlockedMnemonicAndSeed();
+
+  return [
+    !unlockedMnemonic.seed && typeof window !== "undefined"
+      ? !!localStorage?.getItem("locked")
+      : false,
+    loading,
+  ];
+}
+
+export function useUnlockedMnemonicAndSeed(): [
+  unlockedmnemonicAndSeedType,
+  boolean
+] {
+  const [currentUnlockedMnemonic, setCurrentUnlockedMnemonic] =
+    useState<unlockedmnemonicAndSeedType>({});
+
+  useEffect(() => {
+    walletSeedChanged.addListener("change", setCurrentUnlockedMnemonic);
+    unlockedMnemonicAndSeed.then(setCurrentUnlockedMnemonic);
+    return () => {
+      walletSeedChanged.removeListener("change", setCurrentUnlockedMnemonic);
+    };
+  }, []);
+
+  return !currentUnlockedMnemonic
+    ? [EMPTY_MNEMONIC, true]
+    : [currentUnlockedMnemonic, false];
+}
+
 let unlockedMnemonicAndSeed = (async () => {
   if (typeof window !== "undefined") {
     const unlockedExpiration = localStorage.getItem("unlockedExpiration");
@@ -125,7 +165,7 @@ export async function storeMnemonicAndSeed(
 }
 async function deriveEncryptionKey(
   password: string,
-  salt: Buffer,
+  salt: Buffer | Uint8Array,
   iterations: number,
   digest: string
 ): Promise<Uint8Array> {
@@ -162,4 +202,47 @@ function setUnlockedMnemonicAndSeed(
   };
   unlockedMnemonicAndSeed = Promise.resolve(data);
   walletSeedChanged.emit("change", data);
+}
+
+export async function loadMnemonicAndSeed(
+  password: string,
+  stayLoggedIn: boolean
+) {
+  const {
+    encrypted: encodedEncrypted,
+    nonce: encodedNonce,
+    salt: encodedSalt,
+    iterations,
+    digest,
+  } = JSON.parse(localStorage.getItem("locked") || "{}");
+  const encrypted = bs58.decode(encodedEncrypted);
+  const nonce = bs58.decode(encodedNonce);
+  const salt = bs58.decode(encodedSalt);
+  const key = await deriveEncryptionKey(password, salt, iterations, digest);
+  const plaintext = secretbox.open(encrypted, nonce, key);
+  if (!plaintext) {
+    throw new Error("Incorrect password");
+  }
+  const decodedPlaintext = Buffer.from(plaintext).toString();
+  const { mnemonic, seed, derivationPath } = JSON.parse(decodedPlaintext);
+  if (stayLoggedIn) {
+    // if (isExtension) {
+    //   chrome.runtime.sendMessage({
+    //     channel: "sollet_extension_mnemonic_channel",
+    //     method: "set",
+    //     data: decodedPlaintext,
+    //   });
+    // } else {
+    //   sessionStorage.setItem("unlocked", decodedPlaintext);
+    // }
+    sessionStorage.setItem("unlocked", decodedPlaintext);
+  }
+  const importsEncryptionKey = deriveImportsEncryptionKey(seed);
+  setUnlockedMnemonicAndSeed(
+    mnemonic,
+    seed,
+    importsEncryptionKey,
+    derivationPath
+  );
+  return { mnemonic, seed, derivationPath };
 }

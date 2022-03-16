@@ -14,14 +14,17 @@ import {
   Text,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCallAsync } from "../src/hooks/useCallAsync";
 import {
   DERIVATION_PATH,
   generateMnemonicAndSeed,
+  loadMnemonicAndSeed,
   mnemonicAndSeedType,
   normalizeMnemonic,
   storeMnemonicAndSeed,
+  useHasLockedMnemonicAndSeed,
 } from "../src/utils/wallet-seed";
 import styles from "../styles/Home.module.css";
 
@@ -246,10 +249,65 @@ function ChoosePasswordForm({
   );
 }
 
+function LoginForm() {
+  const [password, setPassword] = useState("");
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
+  const callAsync = useCallAsync();
+
+  const submit = () => {
+    callAsync(loadMnemonicAndSeed(password, stayLoggedIn), {
+      progressMessage: "Unlocking wallet...",
+      successMessage: "Wallet unlocked",
+    });
+  };
+  const submitOnEnter = (e: any) => {
+    if (e.code === "Enter" || e.code === "NumpadEnter") {
+      e.preventDefault();
+      e.stopPropagation();
+      submit();
+    }
+  };
+  const setPasswordOnChange = (e: any) => setPassword(e.target.value);
+  const toggleStayLoggedIn = (e: any) => setStayLoggedIn(e.target.checked);
+
+  return (
+    <Box>
+      <Box>
+        <Text variant="h5">Unlock Wallet</Text>
+        <Input
+          variant="outlined"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={setPasswordOnChange}
+          onKeyDown={submitOnEnter}
+        />
+        <Checkbox checked={stayLoggedIn} onChange={toggleStayLoggedIn}>
+          Keep wallet unlocked
+        </Checkbox>
+      </Box>
+      <Box style={{ justifyContent: "flex-end" }}>
+        <Button color="primary" onClick={submit}>
+          Unlock
+        </Button>
+      </Box>
+    </Box>
+  );
+}
+
 const CreateWallet: NextPage = () => {
+  const [restore, setRestore] = useState(false);
+  const [hasLockedMnemonicAndSeed, loading] = useHasLockedMnemonicAndSeed();
+
+  if (loading) {
+    return null;
+  }
   return (
     <div className={styles.container}>
-      <CreateWalletForm />
+      <>
+        {hasLockedMnemonicAndSeed ? <LoginForm /> : <CreateWalletForm />}
+        <br />
+      </>
     </div>
   );
 };

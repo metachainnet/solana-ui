@@ -1,16 +1,11 @@
 import { useCallback, useState } from "react";
 
-export default function useLocalStorageState<T>(
+export function useLocalStorageState<T>(
   key: string,
   defaultState: T
-): [T, (T: T) => void] {
+): [T, (state: T) => void] {
   const [state, setState] = useState(() => {
-    let storedState = null;
-
-    if (typeof window !== "undefined") {
-      storedState = localStorage.getItem(key);
-    }
-
+    let storedState = localStorage.getItem(key);
     if (storedState) {
       return JSON.parse(storedState);
     }
@@ -24,7 +19,6 @@ export default function useLocalStorageState<T>(
         return;
       }
       setState(newState);
-
       if (newState === null) {
         localStorage.removeItem(key);
       } else {
