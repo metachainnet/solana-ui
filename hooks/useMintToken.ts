@@ -6,7 +6,7 @@ import { useKeypairState } from "../context/KeypairProvider";
 
 interface MintTokenData {
   mintPubkey: PublicKey | null;
-  state: "start" | "finish" | "error";
+  state: "ready" | "start" | "finish" | "error";
 }
 
 export default function useMintToken(): [MintTokenData | null, Function] {
@@ -17,6 +17,10 @@ export default function useMintToken(): [MintTokenData | null, Function] {
   const mintToken = React.useCallback(async () => {
     if (!connection) return;
     if (!keypair) return;
+
+    if (mintData && mintData?.state !== "ready") {
+      return;
+    }
 
     setMintData({ mintPubkey: null, state: "start" });
     try {
@@ -31,7 +35,7 @@ export default function useMintToken(): [MintTokenData | null, Function] {
     } catch (e) {
       setMintData({ mintPubkey: null, state: "error" });
     }
-  }, [connection, keypair]);
+  }, [mintData, connection, keypair]);
 
   if (keypair && connection) {
     return [mintData, mintToken];
