@@ -19,6 +19,7 @@ const connectionReducer = (
       return {
         ...state,
         connection: createNewConnection(action.payload),
+        cluster: action.payload,
       };
 
     default:
