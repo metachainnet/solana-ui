@@ -7,6 +7,7 @@ export type ConnectionDispatchType = (action: ConnectionActionType) => void;
 
 export type ConnectionStateType = {
   connection: Connection | undefined;
+  cluster: Cluster;
 };
 
 export type ConnectionActionType = {

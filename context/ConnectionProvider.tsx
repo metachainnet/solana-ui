@@ -1,5 +1,6 @@
 import { Cluster, clusterApiUrl, Connection } from "@solana/web3.js";
 import React from "react";
+import { DEFAULT_CLUSTER } from "../constants/Cluster.const";
 import {
   ConnectionActionType,
   ConnectionDispatchType,
@@ -27,6 +28,7 @@ const connectionReducer = (
 
 const ConnectionStateContext = React.createContext<ConnectionStateType>({
   connection: undefined,
+  cluster: DEFAULT_CLUSTER,
 });
 const ConnectionDispatchContext = React.createContext<
   ConnectionDispatchType | undefined
@@ -38,7 +40,8 @@ export default function ConnectionProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = React.useReducer(connectionReducer, {
-    connection: createNewConnection("mainnet-beta"),
+    connection: createNewConnection(DEFAULT_CLUSTER),
+    cluster: DEFAULT_CLUSTER,
   });
 
   return (

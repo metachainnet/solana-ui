@@ -1,9 +1,14 @@
 import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
+import { Cluster } from "@solana/web3.js";
 import React from "react";
-import { useConnectionDispatch } from "../context/ConnectionProvider";
+import { DEFAULT_CLUSTER } from "../constants/Cluster.const";
+import {
+  useConnectionDispatch,
+  useConnectionState,
+} from "../context/ConnectionProvider";
 
 export default function ClusterSelect(props: any) {
-  const [value, setValue] = React.useState("1");
+  const [value, setValue] = React.useState("2");
   const connectionDispatch = useConnectionDispatch()!;
 
   React.useEffect(() => {
