@@ -6,6 +6,7 @@ import { useKeypairState } from "../context/KeypairProvider";
 import ClusterSelect from "../components/ClusterSelect";
 import KeypairGenerateBtn from "../components/KeypairGenerateBtn";
 import KeypairDeleteBtn from "../components/KeypairDeleteBtn";
+import TokenCreateComponent from "../components/TokenCreateComponent";
 
 const Home: NextPage = () => {
   const { connection } = useConnectionState();
@@ -15,6 +16,7 @@ const Home: NextPage = () => {
     <div suppressHydrationWarning={true} className={styles.container}>
       <ClusterSelect />
       {!!keypair ? <KeypairDeleteBtn /> : <KeypairGenerateBtn />}
+      {keypair && <TokenCreateComponent />}
     </div>
   );
 };

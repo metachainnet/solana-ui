@@ -12,6 +12,8 @@
     "@chakra-ui/react": "^1.8.6",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
+    "@solana/buffer-layout": "^4.0.0",
+    "@solana/spl-token": "^0.2.0",
     "@solana/web3.js": "^1.36.0",
     "framer-motion": "^6.2.8",
     "next": "12.1.0",
