@@ -1,21 +1,18 @@
 import { Button, Stack, useToast } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
 import { useKeypairState } from "../context/KeypairProvider";
+import { useTokenDispatch } from "../context/TokenProvider";
 import useMintToken from "../hooks/useMintToken";
 import ClientOnly from "../utils/ClientOnly";
 
 export default function TokenCreateComponent() {
-  const connection = useConnectionState().connection;
-  const keypair = useKeypairState().keypair;
   const [mintData, mintToken] = useMintToken();
   const toast = useToast();
-
-  useEffect(() => {}, [connection, keypair]);
+  const tokenDispatch = useTokenDispatch();
 
   useEffect(() => {
     if (!mintData) return;
-    const { state: mintState } = mintData;
+    const { state: mintState, error: mintError } = mintData;
 
     switch (mintState) {
       case "start":
@@ -35,18 +32,22 @@ export default function TokenCreateComponent() {
           duration: 3000,
           isClosable: true,
         });
+        tokenDispatch!({
+          type: "ADD_TOKEN",
+          payload: { addToken: mintData.mintPubkey! },
+        });
         break;
       case "error":
         toast({
           title: "Mint Token",
-          description: "Error...",
+          description: `Error Occured ~ ${mintError?.toString()}`,
           status: "error",
           duration: 3000,
           isClosable: true,
         });
         break;
     }
-  }, [mintData, toast]);
+  }, [mintData, toast, tokenDispatch]);
 
   const onClick = () => {
     mintToken();
@@ -54,21 +55,19 @@ export default function TokenCreateComponent() {
 
   return (
     <ClientOnly>
-      {keypair && (
-        <>
-          <Stack direction="row">
-            <Button onClick={onClick} colorScheme="blue">
-              Create Fungible Token
-            </Button>
-            <span>Mint Public Key</span>
-            <span>
-              {mintData?.mintPubkey
-                ? mintData.mintPubkey.toBase58()
-                : "Not yet.."}
-            </span>
-          </Stack>
-        </>
-      )}
+      <>
+        <Stack direction="row">
+          <Button onClick={onClick} colorScheme="blue">
+            Create Fungible Token
+          </Button>
+          <span>Mint Public Key : </span>
+          <span>
+            {mintData?.mintPubkey
+              ? mintData.mintPubkey.toBase58()
+              : `Not yet..`}
+          </span>
+        </Stack>
+      </>
     </ClientOnly>
   );
 }
