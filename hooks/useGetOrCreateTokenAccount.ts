@@ -48,10 +48,10 @@ export default function useGetOrCreateTokenAccount(): [
     } catch (e) {
       setData({ state: "error" });
     } finally {
-      await delay(3000);
-      setData({
-        state: "ready",
-      });
+      // await delay(3000);
+      // setData({
+      //   state: "ready",
+      // });
     }
   }, [connection, keypair, selectedToken]);
 
