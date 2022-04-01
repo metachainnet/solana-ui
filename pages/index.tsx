@@ -10,6 +10,7 @@ import TokenCreateComponent from "../components/TokenCreateComponent";
 import TokenSelect from "../components/TokenSelect";
 import TokenAccountCreate from "../components/TokenAccountCreate";
 import { useTokenState } from "../context/TokenProvider";
+import TransferBtn from "../components/TransferBtn";
 
 const Home: NextPage = () => {
   const { connection } = useConnectionState();
@@ -21,6 +22,7 @@ const Home: NextPage = () => {
       <ClusterSelect />
       <br />
       {!!keypair ? <KeypairDeleteBtn /> : <KeypairGenerateBtn />}
+      {!!keypair && <TransferBtn />}
       <br />
       {keypair && (
         <div>
