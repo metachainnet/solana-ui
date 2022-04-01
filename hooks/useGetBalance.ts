@@ -10,7 +10,6 @@ export default function useGetBalance(): [number | null, Function] {
   const fetchBalance = React.useCallback(() => {
     connection?.getBalance(keypair.publicKey).then((b) => {
       setBalance(b);
-      console.log(b);
     });
   }, [connection, keypair.publicKey]);
 
