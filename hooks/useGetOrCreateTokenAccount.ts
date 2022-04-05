@@ -17,7 +17,9 @@ export default function useGetOrCreateTokenAccount(): [
 ] {
   const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
-  const { selectedToken } = useTokenState();
+  const {
+    selectedToken: { mintPubkey },
+  } = useTokenState();
   const [data, setData] = React.useState<CreateTokenAccountData | null>(null);
 
   const createTokenAccount = React.useCallback(async () => {
@@ -31,7 +33,7 @@ export default function useGetOrCreateTokenAccount(): [
       return;
     }
 
-    if (!selectedToken) {
+    if (!mintPubkey) {
       setData({ state: "error", error: "Token is not selected" });
       return;
     }
@@ -41,7 +43,7 @@ export default function useGetOrCreateTokenAccount(): [
       const account = await getOrCreateAssociatedTokenAccount(
         connection,
         keypair,
-        selectedToken,
+        mintPubkey,
         keypair.publicKey
       );
       setData({ state: "finish", account });
@@ -52,7 +54,7 @@ export default function useGetOrCreateTokenAccount(): [
       //   state: "ready",
       // });
     }
-  }, [connection, keypair, selectedToken]);
+  }, [connection, keypair, mintPubkey]);
 
   return [data, createTokenAccount];
 }

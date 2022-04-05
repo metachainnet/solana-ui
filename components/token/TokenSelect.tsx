@@ -1,10 +1,13 @@
 import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { PublicKey } from "@solana/web3.js";
 import React from "react";
-import { useTokenDispatch, useTokenState } from "../context/TokenProvider";
+import { useTokenDispatch, useTokenState } from "../../context/TokenProvider";
 
 export default function TokenSelect() {
-  const { tokens, selectedToken } = useTokenState();
+  const {
+    tokens,
+    selectedToken: { mintPubkey },
+  } = useTokenState();
   const tokenDispatch = useTokenDispatch()!;
 
   if (tokens.length === 0) {
@@ -38,7 +41,7 @@ export default function TokenSelect() {
       onChange={(nextValue: string) => {
         handleTokenSelect(nextValue);
       }}
-      value={selectedToken?.toBase58()}
+      value={mintPubkey?.toBase58()}
     >
       <Stack direction="column">
         {tokens.map((it: PublicKey) => (

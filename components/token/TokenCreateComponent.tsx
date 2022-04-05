@@ -1,9 +1,8 @@
 import { Button, Stack, useToast } from "@chakra-ui/react";
 import React, { useEffect } from "react";
-import { useKeypairState } from "../context/KeypairProvider";
-import { useTokenDispatch } from "../context/TokenProvider";
-import useMintToken from "../hooks/useMintToken";
-import ClientOnly from "../utils/ClientOnly";
+import { useTokenDispatch } from "../../context/TokenProvider";
+import useMintToken from "../../hooks/useMintToken";
+import ClientOnly from "../../utils/ClientOnly";
 
 export default function TokenCreateComponent() {
   const [mintData, mintToken] = useMintToken();

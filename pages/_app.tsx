@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ConnectionProvider>
         <KeypairProvider>
           <TokenProvider>
-            <Component {...pageProps} />;
+            <Component {...pageProps} />
           </TokenProvider>
         </KeypairProvider>
       </ConnectionProvider>

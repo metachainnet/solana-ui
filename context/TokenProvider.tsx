@@ -13,7 +13,10 @@ import {
 // React Context 선언
 const TokenStateContext = React.createContext<TokenStateType>({
   tokens: [],
-  selectedToken: null,
+  selectedToken: {
+    mintPubkey: null,
+    account: null,
+  },
 });
 const TokenDispatchContext = React.createContext<TokenDispatchType | undefined>(
   undefined
@@ -33,7 +36,13 @@ const tokenReducer = (state: TokenStateType, action: TokenActionType) => {
       const {
         payload: { selectedToken },
       } = action;
-      return { ...state, selectedToken };
+      return {
+        ...state,
+        selectedToken: {
+          ...state.selectedToken,
+          mintPubkey: selectedToken,
+        },
+      };
     case "ADD_TOKEN":
       if (!action.payload || !action.payload.addToken) {
         throw new Error(
@@ -47,6 +56,25 @@ const tokenReducer = (state: TokenStateType, action: TokenActionType) => {
       } = action;
       const newTokens = tokens.concat(addToken);
       return { ...state, tokens: newTokens };
+
+    case "SET_TOKEN_ACCOUNT":
+      if (!action.payload || !action.payload.selectedTokenAccount) {
+        throw new Error(
+          `Illegal Argument : action.payload에 selectedTokenAccount 필요합니다`
+        );
+      }
+
+      const {
+        payload: { selectedTokenAccount },
+      } = action;
+      return {
+        ...state,
+        selectedToken: {
+          ...state.selectedToken,
+          account: selectedTokenAccount,
+        },
+      };
+
     default:
       throw new Error(
         `Illegal State : 지원하지 않는 action.type=${action.type}`
@@ -66,13 +94,18 @@ export default function TokenProvider({
     tokens: localStorageToken?.length
       ? localStorageToken.map((it) => new PublicKey(it))
       : [],
-    selectedToken: null,
+    selectedToken: {
+      mintPubkey: null,
+      account: null,
+    },
   });
 
   React.useEffect(() => {
     if (checkFront()) {
       // state와 localStorage 데이터가 달라지면 로컬스토리지 업데이트
-      const newLocalStorageToken = state.tokens.map((it) => it.toBase58());
+      const newLocalStorageToken = state.tokens.map((it: PublicKey) =>
+        it.toBase58()
+      );
       if (!eqaulsArray(localStorageToken, newLocalStorageToken)) {
         setLocalStorageToken(newLocalStorageToken);
       }

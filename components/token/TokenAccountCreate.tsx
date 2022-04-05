@@ -1,16 +1,18 @@
 import { Button, Stack, useToast } from "@chakra-ui/react";
 import React from "react";
-import useGetOrCreateTokenAccount from "../hooks/useGetOrCreateTokenAccount";
-import ClientOnly from "../utils/ClientOnly";
+import { useTokenDispatch } from "../../context/TokenProvider";
+import useGetOrCreateTokenAccount from "../../hooks/useGetOrCreateTokenAccount";
+import ClientOnly from "../../utils/ClientOnly";
 
 export default function TokenAccountCreate() {
   const toast = useToast();
+  const tokenDispatch = useTokenDispatch()!;
   const [tokenAccountData, getOrCreateTokenAccount] =
     useGetOrCreateTokenAccount();
 
   React.useEffect(() => {
     if (!tokenAccountData) return;
-    const { state, error } = tokenAccountData;
+    const { account, state, error } = tokenAccountData;
 
     switch (state) {
       case "start":
@@ -30,6 +32,12 @@ export default function TokenAccountCreate() {
           duration: 3000,
           isClosable: true,
         });
+        tokenDispatch({
+          type: "SET_TOKEN_ACCOUNT",
+          payload: {
+            selectedTokenAccount: account,
+          },
+        });
         break;
       case "error":
         toast({
@@ -41,22 +49,14 @@ export default function TokenAccountCreate() {
         });
         break;
     }
-  }, [tokenAccountData, toast, getOrCreateTokenAccount]);
-
-  const onClick = () => {
-    getOrCreateTokenAccount();
-  };
+  }, [tokenAccountData, toast, getOrCreateTokenAccount, tokenDispatch]);
 
   return (
     <ClientOnly>
       <Stack direction="row">
-        <Button onClick={onClick} colorScheme="blue">
+        <Button onClick={() => getOrCreateTokenAccount()} colorScheme="blue">
           선택한 토큰 계정 생성
         </Button>
-        <span>토큰 계정 주소 - </span>
-        <span>
-          {tokenAccountData?.account?.address.toBase58() || "만들어 주세요!!"}
-        </span>
       </Stack>
     </ClientOnly>
   );

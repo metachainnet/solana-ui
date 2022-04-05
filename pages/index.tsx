@@ -1,19 +1,19 @@
 import type { NextPage } from "next";
-import styles from "../styles/Home.module.css";
 import React from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
-import { useKeypairState } from "../context/KeypairProvider";
 import ClusterSelect from "../components/ClusterSelect";
-import KeypairGenerateBtn from "../components/KeypairGenerateBtn";
 import KeypairDeleteBtn from "../components/KeypairDeleteBtn";
-import TokenCreateComponent from "../components/TokenCreateComponent";
-import TokenSelect from "../components/TokenSelect";
-import TokenAccountCreate from "../components/TokenAccountCreate";
-import { useTokenState } from "../context/TokenProvider";
+import KeypairGenerateBtn from "../components/KeypairGenerateBtn";
+import TokenBalance from "../components/token/TokenAccountInfo";
+import TokenAccountCreate from "../components/token/TokenAccountCreate";
+import TokenCreateComponent from "../components/token/TokenCreateComponent";
+import TokenSelect from "../components/token/TokenSelect";
+import TokenTransferBtn from "../components/token/TokenTransferBtn";
 import TransferBtn from "../components/TransferBtn";
+import { useKeypairState } from "../context/KeypairProvider";
+import { useTokenState } from "../context/TokenProvider";
+import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
-  const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
   const { selectedToken } = useTokenState();
 
@@ -36,6 +36,8 @@ const Home: NextPage = () => {
             <>
               <h3 style={{ fontSize: "2rem" }}>토큰 계정을 생성하세요 🕶</h3>
               <TokenAccountCreate />
+              <TokenBalance />
+              <TokenTransferBtn />
             </>
           )}
         </div>
