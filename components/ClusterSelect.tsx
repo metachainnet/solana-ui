@@ -1,7 +1,7 @@
 import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import { Cluster } from "@solana/web3.js";
 import React from "react";
-import { ClusterOptions } from "../constants/Cluster.const";
+import { ClusterOptions, Metachainnet } from "../constants/Cluster.const";
 import {
   useConnectionDispatch,
   useConnectionState,
@@ -11,7 +11,7 @@ export default function ClusterSelect(props: any) {
   const { cluster } = useConnectionState();
   const connectionDispatch = useConnectionDispatch()!;
 
-  const handleRadioChange = (nextValue: Cluster) => {
+  const handleRadioChange = (nextValue: Cluster | Metachainnet) => {
     switch (nextValue) {
       case "mainnet-beta":
         connectionDispatch({
@@ -31,6 +31,11 @@ export default function ClusterSelect(props: any) {
           payload: "devnet",
         });
         break;
+      case "metachainnet":
+        connectionDispatch({
+          type: "CHANGE_CONNECTION",
+          payload: "metachainnet",
+        });
       default:
         break;
     }
@@ -38,7 +43,8 @@ export default function ClusterSelect(props: any) {
 
   return (
     <RadioGroup
-      onChange={(nextValue: Cluster) => {
+      onChange={(nextValue: Cluster | Metachainnet) => {
+        console.log(nextValue);
         handleRadioChange(nextValue);
       }}
       value={cluster}

@@ -1,29 +1,36 @@
 import { Cluster } from "@solana/web3.js";
 
+export type Metachainnet = "metachainnet";
+
 enum ClusterEnum {
   mainnet = "mainnet-beta",
   testnet = "testnet",
   devnet = "devnet",
+  metachainnet = "metachainnet",
 }
 
 type ClusterOption = {
-  cluster: Cluster;
+  cluster: Cluster | Metachainnet;
   displayName: string;
 };
 
-export const DEFAULT_CLUSTER: Cluster = ClusterEnum.testnet;
+export const DEFAULT_CLUSTER: Cluster | Metachainnet = ClusterEnum.metachainnet;
 
 export const ClusterOptions: ClusterOption[] = [
   {
-    cluster: ClusterEnum.mainnet,
-    displayName: "Mainnet",
+    cluster: ClusterEnum.metachainnet,
+    displayName: "Metaverse2Chain",
   },
   {
-    cluster: ClusterEnum.testnet,
-    displayName: "Testnet",
+    cluster: ClusterEnum.mainnet,
+    displayName: "Solana - Mainnet",
   },
   {
     cluster: ClusterEnum.devnet,
-    displayName: "Devnet",
+    displayName: "Solana - Devnet",
+  },
+  {
+    cluster: ClusterEnum.testnet,
+    displayName: "Solana - Testnet",
   },
 ];
