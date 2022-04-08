@@ -5,9 +5,9 @@ import {
 } from "@solana/spl-token";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import React, { useState } from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
-import { useKeypairState } from "../context/KeypairProvider";
-import { useTokenState } from "../context/TokenProvider";
+import { useConnectionState } from "../../context/ConnectionProvider";
+import { useKeypairState } from "../../context/KeypairProvider";
+import { useTokenState } from "../../context/TokenProvider";
 
 interface MintToAddressData {
   state: "error" | "start" | "finish";

@@ -20,7 +20,7 @@ import React from "react";
 import { useConnectionState } from "../../context/ConnectionProvider";
 import { useKeypairState } from "../../context/KeypairProvider";
 import { useTokenState } from "../../context/TokenProvider";
-import useMintToAddress from "../../hooks/useMintToAddress";
+import useMintToAddress from "../../hooks/token/useMintToAddress";
 
 export default function TokenMintBtn() {
   const { isOpen, onOpen, onClose } = useDisclosure();

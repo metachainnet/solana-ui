@@ -1,11 +1,11 @@
 import { createMint } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import React from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
-import { useKeypairState } from "../context/KeypairProvider";
-import { useTokenDispatch } from "../context/TokenProvider";
+import { useConnectionState } from "../../context/ConnectionProvider";
+import { useKeypairState } from "../../context/KeypairProvider";
+import { useTokenDispatch } from "../../context/TokenProvider";
 
-interface MintTokenData {
+interface CreateTokenData {
   mintPubkey?: PublicKey;
   state: "ready" | "start" | "finish" | "error";
   error?: any;
@@ -15,12 +15,12 @@ interface MintTokenData {
  * 새로운 토큰 생성
  * @returns
  */
-export default function useCreateMint(): [MintTokenData | null, Function] {
+export default function useCreateToken(): [CreateTokenData | null, Function] {
   const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
   const tokenDispatch = useTokenDispatch()!;
 
-  const [mintData, setMintData] = React.useState<MintTokenData | null>(null);
+  const [mintData, setMintData] = React.useState<CreateTokenData | null>(null);
 
   const mintToken = React.useCallback(async () => {
     if (!connection) {
@@ -38,8 +38,8 @@ export default function useCreateMint(): [MintTokenData | null, Function] {
       return;
     }
 
-    setMintData({ state: "start" });
     try {
+      setMintData({ state: "start" });
       const mintPubkey = await createMint(
         connection,
         keypair,

@@ -1,29 +1,26 @@
 import { Button, useToast } from "@chakra-ui/react";
 import React from "react";
-import { useTokenDispatch } from "../../context/TokenProvider";
-import useMintToken from "../../hooks/useCreateMint";
+import useCreateToken from "../../hooks/token/useCreateToken";
 import ClientOnly from "../../utils/ClientOnly";
 import { ToastOptionsBulder } from "../../utils/utils";
 
 export default function CreateToken() {
   const toast = useToast();
-  const [mintData, mintToken] = useMintToken();
-
-  const getToastOption = ToastOptionsBulder({
-    title: "토큰 민팅",
-    duration: 2500,
-    isCloseable: true,
-  });
+  const [mintData, mintToken] = useCreateToken();
 
   React.useEffect(() => {
     if (!mintData) return;
     const { state, error, mintPubkey } = mintData;
 
-    console.log(state);
+    const getToastOption = ToastOptionsBulder({
+      title: "토큰 민팅",
+      duration: 2500,
+      isCloseable: true,
+    });
 
     switch (state) {
       case "start":
-        toast(getToastOption({ status: "info", description: "발행 시작..." }));
+        toast(getToastOption({ status: "info", description: "발행 시작 🚀" }));
         break;
       case "finish":
         toast(
@@ -42,15 +39,13 @@ export default function CreateToken() {
         );
         break;
     }
-  }, [mintData, toast, getToastOption]);
+  }, [mintData, toast]);
 
   return (
     <ClientOnly>
-      <>
-        <Button onClick={() => mintToken()} colorScheme="blue">
-          새로운 토큰 생성
-        </Button>
-      </>
+      <Button onClick={() => mintToken()} colorScheme="blue">
+        새로운 토큰 생성
+      </Button>
     </ClientOnly>
   );
 }

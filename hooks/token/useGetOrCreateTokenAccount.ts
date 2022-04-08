@@ -1,8 +1,8 @@
 import { Account, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import React from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
-import { useKeypairState } from "../context/KeypairProvider";
-import { useTokenState } from "../context/TokenProvider";
+import { useConnectionState } from "../../context/ConnectionProvider";
+import { useKeypairState } from "../../context/KeypairProvider";
+import { useTokenState } from "../../context/TokenProvider";
 
 interface CreateTokenAccountData {
   account?: Account;

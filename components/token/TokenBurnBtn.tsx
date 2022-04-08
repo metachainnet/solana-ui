@@ -18,7 +18,7 @@ import React from "react";
 import { useConnectionState } from "../../context/ConnectionProvider";
 import { useKeypairState } from "../../context/KeypairProvider";
 import { useTokenState } from "../../context/TokenProvider";
-import useBurnToken from "../../hooks/useBurnToken";
+import useBurnToken from "../../hooks/token/useBurnToken";
 import { ToastOptionsBulder } from "../../utils/utils";
 
 export default function TokenBurnBtn() {

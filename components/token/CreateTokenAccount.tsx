@@ -1,7 +1,7 @@
 import { Button, Stack, useToast } from "@chakra-ui/react";
 import React from "react";
 import { useTokenDispatch } from "../../context/TokenProvider";
-import useGetOrCreateTokenAccount from "../../hooks/useGetOrCreateTokenAccount";
+import useGetOrCreateTokenAccount from "../../hooks/token/useGetOrCreateTokenAccount";
 import ClientOnly from "../../utils/ClientOnly";
 
 export default function CreateTokenAccount() {
