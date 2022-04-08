@@ -3,7 +3,6 @@ import React from "react";
 import { useConnectionState } from "../context/ConnectionProvider";
 import { useKeypairState } from "../context/KeypairProvider";
 import { useTokenState } from "../context/TokenProvider";
-import { delay } from "../utils/utils";
 
 interface CreateTokenAccountData {
   account?: Account;
@@ -49,12 +48,13 @@ export default function useGetOrCreateTokenAccount(): [
       setData({ state: "finish", account });
     } catch (e) {
       setData({ state: "error" });
-    } finally {
-      // setData({
-      //   state: "ready",
-      // });
     }
   }, [connection, keypair, mintPubkey]);
+
+  React.useEffect(() => {
+    // if Mint Pubkey changed, reset the state
+    setData({ state: "ready" });
+  }, [mintPubkey]);
 
   return [data, createTokenAccount];
 }

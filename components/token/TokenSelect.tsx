@@ -11,7 +11,7 @@ export default function TokenSelect() {
   const tokenDispatch = useTokenDispatch()!;
 
   if (tokens.length === 0) {
-    return <p>Don't have token infos</p>;
+    return <p>토큰 정보가 없습니다. 토큰을 생성해보세요</p>;
   }
 
   const handleTokenSelect = (nextValue: string) => {

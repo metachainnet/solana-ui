@@ -16,87 +16,122 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import {
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  sendAndConfirmTransaction,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
+import { getOrCreateAssociatedTokenAccount, transfer } from "@solana/spl-token";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import React from "react";
 import { useConnectionState } from "../../context/ConnectionProvider";
 import { useKeypairState } from "../../context/KeypairProvider";
-import useGetBalance from "../../hooks/useGetBalance";
+import { useTokenState } from "../../context/TokenProvider";
 
 export default function TokenTransferBtn() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
   const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
-  const [balance, fetchBalance] = useGetBalance();
+  const {
+    selectedToken: { mintPubkey, account },
+  } = useTokenState();
 
   const [address, setAddress] = React.useState("");
   const handleAddressChange = (event: any) => setAddress(event.target.value);
   const [amount, setAmount] = React.useState("");
   const handleAmountChange = (value: any) => setAmount(value);
 
-  const handleTransfer = () => {
-    if (!connection || !keypair) {
+  const handleTransfer = async () => {
+    if (!connection) {
+      toast({
+        status: "warning",
+        title: "Token transfer",
+        description: "RPC 서버에 연결되지 않았습니다",
+        duration: 2500,
+      });
       return;
     }
-    let toPubkey = null;
-    try {
-      toPubkey = new PublicKey(address);
-    } catch (error: any) {
+
+    if (!keypair) {
       toast({
-        title: error.message,
-        status: "error",
+        status: "warning",
+        title: "Token transfer",
+        description: "지갑이 연결되지 않았습니다",
+        duration: 2500,
+      });
+      return;
+    }
+
+    if (!mintPubkey) {
+      toast({
+        status: "warning",
+        title: "Token transfer",
+        description: "토큰이 선택되지 않았습니다",
+        duration: 2500,
+      });
+      return;
+    }
+
+    if (!account) {
+      toast({
+        status: "warning",
+        title: "Token transfer",
+        description: "토큰 계정 정보가 없습니다",
+        duration: 2500,
+      });
+      return;
+    }
+
+    if (address === "") {
+      toast({
+        status: "warning",
+        title: "Token transfer",
+        description: "보낼 주소가 입력되지 않았습니다",
+        duration: 2500,
+      });
+      return;
+    }
+
+    if (amount === "") {
+      toast({
+        status: "warning",
+        title: "Token transfer",
+        description: "보낼 양이 입력되지 않았습니다",
+        duration: 2500,
       });
     }
-    if (toPubkey) {
-      let transaction = new Transaction();
-      transaction.add(
-        SystemProgram.transfer({
-          fromPubkey: keypair.publicKey,
-          toPubkey,
-          lamports: parseFloat(amount) * LAMPORTS_PER_SOL,
-        })
+
+    try {
+      const toPubkey = new PublicKey(address);
+
+      const toAccount = await getOrCreateAssociatedTokenAccount(
+        connection,
+        keypair,
+        mintPubkey,
+        toPubkey
       );
-
-      sendAndConfirmTransaction(connection, transaction, [keypair])
-        .then((result) => {
-          toast({
-            title: "Success",
-            description: `Signature: ${result}`,
-            status: "success",
-          });
-          fetchBalance();
-        })
-        .catch((err) => {
-          toast({
-            title: "Failure",
-            description: `Transfer failed.${err.message}`,
-            status: "error",
-          });
-        });
-
+      transfer(
+        connection,
+        keypair,
+        account?.address,
+        toAccount.address,
+        keypair,
+        parseFloat(amount) * LAMPORTS_PER_SOL
+      );
+    } catch (e) {
       toast({
-        title: "Tranfer started",
-        status: "info",
+        status: "error",
+        title: "Token transfer",
+        description: `전송중 오류가 발생했습니다 : ${e}`,
+        duration: 2500,
       });
-      onClose();
     }
   };
-  console.log(balance);
+
   return (
     <>
-      <Box marginY={5}>
-        <Button onClick={onOpen}>토큰 전송</Button>
-      </Box>
+      <Button onClick={onOpen}>토큰 전송</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Solana 전송</ModalHeader>
+          <ModalHeader>토큰 전송</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <InputGroup>

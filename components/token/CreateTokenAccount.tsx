@@ -4,7 +4,7 @@ import { useTokenDispatch } from "../../context/TokenProvider";
 import useGetOrCreateTokenAccount from "../../hooks/useGetOrCreateTokenAccount";
 import ClientOnly from "../../utils/ClientOnly";
 
-export default function TokenAccountCreate() {
+export default function CreateTokenAccount() {
   const toast = useToast();
   const tokenDispatch = useTokenDispatch()!;
   const [tokenAccountData, getOrCreateTokenAccount] =
@@ -42,7 +42,7 @@ export default function TokenAccountCreate() {
       case "error":
         toast({
           title: "Get or Create Token Account",
-          description: `Error Occured ~ ${error?.toString()}`,
+          description: `오류 발생 ===> ${error?.toString()}`,
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -55,7 +55,7 @@ export default function TokenAccountCreate() {
     <ClientOnly>
       <Stack direction="row">
         <Button onClick={() => getOrCreateTokenAccount()} colorScheme="blue">
-          선택한 토큰 계정 생성
+          선택한 토큰 계정 생성 또는 찾기
         </Button>
       </Stack>
     </ClientOnly>

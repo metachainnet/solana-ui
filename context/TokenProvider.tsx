@@ -36,13 +36,14 @@ const tokenReducer = (state: TokenStateType, action: TokenActionType) => {
       const {
         payload: { selectedToken },
       } = action;
-      return {
+      const newState = {
         ...state,
         selectedToken: {
-          ...state.selectedToken,
           mintPubkey: selectedToken,
+          account: null,
         },
       };
+      return newState;
     case "ADD_TOKEN":
       if (!action.payload || !action.payload.addToken) {
         throw new Error(

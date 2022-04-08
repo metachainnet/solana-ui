@@ -1,18 +1,17 @@
 import {
-  Stack,
   Table,
   TableCaption,
   TableContainer,
   Tbody,
   Td,
-  Thead,
   Tr,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTokenState } from "../../context/TokenProvider";
 import ClientOnly from "../../utils/ClientOnly";
+import { displayMetaToken } from "../../utils/utils";
 
-export default function TokenBalance() {
+export default function TokenAccountInfo() {
   const {
     selectedToken: { account },
   } = useTokenState();
@@ -33,7 +32,7 @@ export default function TokenBalance() {
             </Tr>
             <Tr>
               <Td>토큰 갯수</Td>
-              <Td>{account.amount.toLocaleString()}</Td>
+              <Td>{displayMetaToken(account.amount)}</Td>
             </Tr>
             <Tr>
               <Td>얼림 상태</Td>
