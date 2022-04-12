@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Input,
   InputGroup,
@@ -16,114 +15,54 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { getOrCreateAssociatedTokenAccount, transfer } from "@solana/spl-token";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import React from "react";
-import { useConnectionState } from "../../context/ConnectionProvider";
-import { useKeypairState } from "../../context/KeypairProvider";
-import { useTokenState } from "../../context/TokenProvider";
+import useTransferToken from "../../hooks/token/useTransferToken";
+import { ToastOptionsBulder } from "../../utils/utils";
 
 export default function TokenTransferBtn() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  const { connection } = useConnectionState();
-  const { keypair } = useKeypairState();
-  const {
-    selectedToken: { mintPubkey, account },
-  } = useTokenState();
+  const [transferData, transferToken] = useTransferToken();
 
   const [address, setAddress] = React.useState("");
   const handleAddressChange = (event: any) => setAddress(event.target.value);
   const [amount, setAmount] = React.useState("");
   const handleAmountChange = (value: any) => setAmount(value);
 
-  const handleTransfer = async () => {
-    if (!connection) {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "RPC 서버에 연결되지 않았습니다",
-        duration: 2500,
-      });
-      return;
-    }
+  React.useEffect(() => {
+    if (!transferData) return;
 
-    if (!keypair) {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "지갑이 연결되지 않았습니다",
-        duration: 2500,
-      });
-      return;
-    }
+    const { state, error, txSignature } = transferData;
 
-    if (!mintPubkey) {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "토큰이 선택되지 않았습니다",
-        duration: 2500,
-      });
-      return;
-    }
+    const getToastOption = ToastOptionsBulder({
+      title: "토큰 전송",
+      duration: 2500,
+      isCloseable: true,
+    });
 
-    if (!account) {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "토큰 계정 정보가 없습니다",
-        duration: 2500,
-      });
-      return;
+    switch (state) {
+      case "start":
+        toast(getToastOption({ status: "info", description: "전송 시작 🚀" }));
+        break;
+      case "finish":
+        toast(
+          getToastOption({
+            status: "success",
+            description: `발행 성공 ✅ ===> 주소 ${txSignature!} `,
+          })
+        );
+        break;
+      case "error":
+        toast(
+          getToastOption({
+            status: "error",
+            description: `오류 발생 ❌ ===> ${error?.toString()}`,
+          })
+        );
+        break;
     }
-
-    if (address === "") {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "보낼 주소가 입력되지 않았습니다",
-        duration: 2500,
-      });
-      return;
-    }
-
-    if (amount === "") {
-      toast({
-        status: "warning",
-        title: "Token transfer",
-        description: "보낼 양이 입력되지 않았습니다",
-        duration: 2500,
-      });
-    }
-
-    try {
-      const toPubkey = new PublicKey(address);
-
-      const toAccount = await getOrCreateAssociatedTokenAccount(
-        connection,
-        keypair,
-        mintPubkey,
-        toPubkey
-      );
-      transfer(
-        connection,
-        keypair,
-        account?.address,
-        toAccount.address,
-        keypair,
-        parseFloat(amount) * LAMPORTS_PER_SOL
-      );
-    } catch (e) {
-      toast({
-        status: "error",
-        title: "Token transfer",
-        description: `전송중 오류가 발생했습니다 : ${e}`,
-        duration: 2500,
-      });
-    }
-  };
+  }, [transferData, toast]);
 
   return (
     <>
@@ -154,7 +93,10 @@ export default function TokenTransferBtn() {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               닫기
             </Button>
-            <Button variant="ghost" onClick={handleTransfer}>
+            <Button
+              variant="ghost"
+              onClick={() => transferToken(address, parseFloat(amount))}
+            >
               전송
             </Button>
           </ModalFooter>
