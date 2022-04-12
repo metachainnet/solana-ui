@@ -10,34 +10,31 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  NumberInput,
-  NumberInputField,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import React from "react";
-import useMintToAddress from "../../hooks/token/useMintToAddress";
+import { useTokenDispatch } from "../../context/TokenProvider";
+import useMintInfo from "../../hooks/token/useMintInfo";
 import ClientOnly from "../../utils/ClientOnly";
 import { ToastOptionsBulder } from "../../utils/utils";
 
-export default function TokenMintBtn() {
+export default function AddTokenBtn() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  const [address, setAddress] = React.useState("");
-  const handleAddressChange = (event: React.SyntheticEvent<HTMLInputElement>) =>
-    setAddress(event.currentTarget.value);
-  const [amount, setAmount] = React.useState("");
-  const handleAmountChange = (value: string) => setAmount(value);
+  const [mintInfoData, getMintInfo] = useMintInfo();
+  const tokenDispatch = useTokenDispatch()!;
 
-  const [mintToAddressData, mintToAddress] = useMintToAddress();
+  const [address, setAddress] = React.useState("");
+  const handleAddressChange = (event: any) => setAddress(event.target.value);
 
   React.useEffect(() => {
-    if (!mintToAddressData) return;
+    if (!mintInfoData) return;
 
-    const { state, signature, error } = mintToAddressData;
+    const { state, error, mintInfo } = mintInfoData;
     const getToastOption = ToastOptionsBulder({
-      title: "토큰 발행",
+      title: "토큰 추가",
       duration: 2500,
       isCloseable: true,
     });
@@ -45,16 +42,21 @@ export default function TokenMintBtn() {
     switch (state) {
       case "start":
         toast(
-          getToastOption({ status: "info", description: "토큰 발행 시작 🚀" })
+          getToastOption({ status: "info", description: "토큰 추가 시작 🚀" })
         );
         break;
       case "finish":
         toast(
           getToastOption({
             status: "success",
-            description: `토큰 발행이 완료되었습니다 ✅ ==> signature : ${signature}`,
+            description: `토큰 추가 성공 ✅`,
           })
         );
+        onClose();
+        tokenDispatch({
+          type: "ADD_TOKEN",
+          payload: { addToken: mintInfo!.address },
+        });
         break;
       case "error":
         toast(
@@ -65,40 +67,29 @@ export default function TokenMintBtn() {
         );
         break;
     }
-  }, [mintToAddressData, toast]);
+  }, [mintInfoData, toast, onClose, tokenDispatch]);
 
   return (
     <ClientOnly>
-      <Button onClick={onOpen} colorScheme="green">
-        토큰 발행
-      </Button>
+      <Button onClick={onOpen}>토큰 추가</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>토큰 발행</ModalHeader>
+          <ModalHeader>토큰 추가</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <InputGroup>
               <InputLeftAddon>Address</InputLeftAddon>
               <Input value={address} onChange={handleAddressChange} />
             </InputGroup>
-            <InputGroup>
-              <InputLeftAddon>Amount</InputLeftAddon>
-              <NumberInput w="100" value={amount} onChange={handleAmountChange}>
-                <NumberInputField />
-              </NumberInput>
-            </InputGroup>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr="3" onClick={onClose}>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
               닫기
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => mintToAddress(address, parseFloat(amount))}
-            >
-              전송
+            <Button variant="ghost" onClick={() => getMintInfo(address)}>
+              추가
             </Button>
           </ModalFooter>
         </ModalContent>

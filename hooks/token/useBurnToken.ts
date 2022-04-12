@@ -30,20 +30,34 @@ export default function useBurnToken(): [
   const burnToken = React.useCallback(
     async (amount: number) => {
       if (!connection) {
-        console.warn(`Error with mindToAddress : connection is not found`);
-        setState({ state: "error" });
+        setState({
+          state: "error",
+          error: "RPC 서버가 연결되지 않았습니다",
+        });
         return;
       }
+
       if (!keypair) {
-        console.warn(`Error with mindToAddress : keypair is not found`);
+        setState({
+          state: "error",
+          error: "지갑이 연결되지 않았습니다",
+        });
         return;
       }
+
       if (!mintPubkey) {
-        console.warn(`Error with mindToAddress : mintPubkey is not found`);
+        setState({
+          state: "error",
+          error: "토큰이 선택되지 않았습니다",
+        });
         return;
       }
+
       if (!account) {
-        console.warn(`Error with mindToAddress : account is not found`);
+        setState({
+          state: "error",
+          error: "토큰 계정이 존재하지 않습니다",
+        });
         return;
       }
 
@@ -57,10 +71,8 @@ export default function useBurnToken(): [
           keypair,
           amount * LAMPORTS_PER_SOL
         );
-
         setState({ state: "finish", signature: txSignature });
-      } catch (e: any) {
-        console.error(`Error Occured with burnToken : ${e.toString()}`);
+      } catch (e) {
         setState({ state: "error", error: e });
       }
     },

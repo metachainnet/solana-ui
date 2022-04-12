@@ -32,24 +32,35 @@ export default function useMintToAddress(): [
   const [state, setState] = useState<MintToAddressData | null>(null);
 
   const mintToAddress = React.useCallback(
-    async (toAddressStr: string, amount: number) => {
+    async (addressStr: string, amount: number) => {
       if (!connection) {
-        console.warn(`Error with mindToAddress : connection is not found`);
+        setState({
+          state: "error",
+          error: "RPC 서버가 연결되지 않았습니다",
+        });
         return;
       }
+
       if (!keypair) {
-        console.warn(`Error with mindToAddress : keypair is not found`);
+        setState({
+          state: "error",
+          error: "지갑이 연결되지 않았습니다",
+        });
         return;
       }
+
       if (!mintPubkey) {
-        console.warn(`Error with mindToAddress : mintPubkey is not found`);
+        setState({
+          state: "error",
+          error: "토큰이 선택되지 않았습니다",
+        });
         return;
       }
 
       try {
         setState({ state: "start" });
 
-        const toPubkey = new PublicKey(toAddressStr);
+        const toPubkey = new PublicKey(addressStr);
         const toTokenAddress = await getAssociatedTokenAddress(
           mintPubkey,
           toPubkey
@@ -63,10 +74,8 @@ export default function useMintToAddress(): [
           keypair,
           amount * LAMPORTS_PER_SOL
         );
-
         setState({ state: "finish", signature: txSignature });
-      } catch (e: any) {
-        console.error(`Error Occured with mintToAddress : ${e.toString()}`);
+      } catch (e) {
         setState({ state: "error", error: e });
       }
     },

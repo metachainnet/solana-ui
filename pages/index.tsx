@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Stack } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
@@ -16,6 +16,7 @@ import TransferBtn from "../components/TransferBtn";
 import { useKeypairState } from "../context/KeypairProvider";
 import { useTokenState } from "../context/TokenProvider";
 import styles from "../styles/Home.module.css";
+import AddTokenBtn from "../components/token/AddToken";
 
 const Home: NextPage = () => {
   const { keypair } = useKeypairState();
@@ -35,8 +36,13 @@ const Home: NextPage = () => {
         <br />
         {!!keypair && (
           <div>
-            <h3 style={{ fontSize: "2rem" }}>새로운 토큰을 생성해보세요 💪</h3>
-            <CreateToken />
+            <h3 style={{ fontSize: "2rem" }}>
+              새로운 토큰을 생성하거나 추가해보세요 💪
+            </h3>
+            <Stack direction={"column"}>
+              <CreateToken />
+              <AddTokenBtn />
+            </Stack>
             <br />
             <h3 style={{ fontSize: "2rem" }}>토큰을 선택하세요 👀</h3>
             <TokenSelect />

@@ -3,6 +3,7 @@ import React from "react";
 import { useTokenDispatch } from "../../context/TokenProvider";
 import useGetOrCreateTokenAccount from "../../hooks/token/useGetOrCreateTokenAccount";
 import ClientOnly from "../../utils/ClientOnly";
+import { ToastOptionsBulder } from "../../utils/utils";
 
 export default function CreateTokenAccount() {
   const toast = useToast();
@@ -14,24 +15,28 @@ export default function CreateTokenAccount() {
     if (!tokenAccountData) return;
     const { account, state, error } = tokenAccountData;
 
+    const getToastOption = ToastOptionsBulder({
+      title: "토큰 계정 생성 또는 찾기",
+      duration: 2500,
+      isCloseable: true,
+    });
+
     switch (state) {
       case "start":
-        toast({
-          title: "Get or Create Token Account",
-          description: "Starting...",
-          status: "info",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast(
+          getToastOption({
+            status: "info",
+            description: "토큰 계정 발급 시작 🚀",
+          })
+        );
         break;
       case "finish":
-        toast({
-          title: "Get or Create Token Account",
-          description: "Finish...",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast(
+          getToastOption({
+            status: "success",
+            description: `토큰 계정 발급 성공 ✅`,
+          })
+        );
         tokenDispatch({
           type: "SET_TOKEN_ACCOUNT",
           payload: {
@@ -40,13 +45,12 @@ export default function CreateTokenAccount() {
         });
         break;
       case "error":
-        toast({
-          title: "Get or Create Token Account",
-          description: `오류 발생 ===> ${error?.toString()}`,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast(
+          getToastOption({
+            status: "error",
+            description: `오류 발생 ❌ ===> ${error?.toString()}`,
+          })
+        );
         break;
     }
   }, [tokenAccountData, toast, getOrCreateTokenAccount, tokenDispatch]);
@@ -55,7 +59,7 @@ export default function CreateTokenAccount() {
     <ClientOnly>
       <Stack direction="row">
         <Button onClick={() => getOrCreateTokenAccount()} colorScheme="blue">
-          선택한 토큰 계정 생성 또는 찾기
+          토큰 계정 생성 또는 찾기
         </Button>
       </Stack>
     </ClientOnly>

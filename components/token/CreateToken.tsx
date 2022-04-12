@@ -13,20 +13,22 @@ export default function CreateToken() {
     const { state, error, mintPubkey } = mintData;
 
     const getToastOption = ToastOptionsBulder({
-      title: "토큰 민팅",
+      title: "토큰 생성",
       duration: 2500,
       isCloseable: true,
     });
 
     switch (state) {
       case "start":
-        toast(getToastOption({ status: "info", description: "발행 시작 🚀" }));
+        toast(
+          getToastOption({ status: "info", description: "토큰 생성 시작 🚀" })
+        );
         break;
       case "finish":
         toast(
           getToastOption({
             status: "success",
-            description: `발행 성공 ✅ ===> 주소 ${mintPubkey!.toBase58()} `,
+            description: `토큰 생성 성공 ✅ ===> 서명: ${mintPubkey!.toBase58()} `,
           })
         );
         break;

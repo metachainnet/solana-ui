@@ -5,14 +5,14 @@ import { useKeypairState } from "../../context/KeypairProvider";
 import { useTokenState } from "../../context/TokenProvider";
 
 interface CreateTokenAccountData {
-  account?: Account;
   state: "ready" | "start" | "finish" | "error";
+  account?: Account;
   error?: any;
 }
 
 export default function useGetOrCreateTokenAccount(): [
   CreateTokenAccountData | null,
-  Function
+  () => void
 ] {
   const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
@@ -23,22 +23,28 @@ export default function useGetOrCreateTokenAccount(): [
 
   const createTokenAccount = React.useCallback(async () => {
     if (!connection) {
-      setData({ state: "error", error: "Connection is not found" });
+      setData({
+        state: "error",
+        error: "RPC 서버가 연결되지 않았습니다",
+      });
       return;
     }
 
     if (!keypair) {
-      setData({ state: "error", error: "Account is not found" });
+      setData({
+        state: "error",
+        error: "지갑이 연결되지 않았습니다",
+      });
       return;
     }
 
     if (!mintPubkey) {
-      setData({ state: "error", error: "Token is not selected" });
+      setData({ state: "error", error: "토큰이 선택되지 않았습니다" });
       return;
     }
 
-    setData({ state: "start" });
     try {
+      setData({ state: "start" });
       const account = await getOrCreateAssociatedTokenAccount(
         connection,
         keypair,
@@ -47,14 +53,9 @@ export default function useGetOrCreateTokenAccount(): [
       );
       setData({ state: "finish", account });
     } catch (e) {
-      setData({ state: "error" });
+      setData({ state: "error", error: e });
     }
   }, [connection, keypair, mintPubkey]);
-
-  React.useEffect(() => {
-    // if Mint Pubkey changed, reset the state
-    setData({ state: "ready" });
-  }, [mintPubkey]);
 
   return [data, createTokenAccount];
 }
