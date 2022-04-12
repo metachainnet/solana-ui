@@ -1,58 +1,61 @@
 import { Account, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import React from "react";
-import { useConnectionState } from "../context/ConnectionProvider";
-import { useKeypairState } from "../context/KeypairProvider";
-import { useTokenState } from "../context/TokenProvider";
-import { delay } from "../utils/utils";
+import { useConnectionState } from "../../context/ConnectionProvider";
+import { useKeypairState } from "../../context/KeypairProvider";
+import { useTokenState } from "../../context/TokenProvider";
 
 interface CreateTokenAccountData {
-  account?: Account;
   state: "ready" | "start" | "finish" | "error";
+  account?: Account;
   error?: any;
 }
 
 export default function useGetOrCreateTokenAccount(): [
   CreateTokenAccountData | null,
-  Function
+  () => void
 ] {
   const { connection } = useConnectionState();
   const { keypair } = useKeypairState();
-  const { selectedToken } = useTokenState();
+  const {
+    selectedToken: { mintPubkey },
+  } = useTokenState();
   const [data, setData] = React.useState<CreateTokenAccountData | null>(null);
 
   const createTokenAccount = React.useCallback(async () => {
     if (!connection) {
-      setData({ state: "error", error: "Connection is not found" });
+      setData({
+        state: "error",
+        error: "RPC 서버가 연결되지 않았습니다",
+      });
       return;
     }
 
     if (!keypair) {
-      setData({ state: "error", error: "Account is not found" });
+      setData({
+        state: "error",
+        error: "지갑이 연결되지 않았습니다",
+      });
       return;
     }
 
-    if (!selectedToken) {
-      setData({ state: "error", error: "Token is not selected" });
+    if (!mintPubkey) {
+      setData({ state: "error", error: "토큰이 선택되지 않았습니다" });
       return;
     }
 
-    setData({ state: "start" });
     try {
+      setData({ state: "start" });
       const account = await getOrCreateAssociatedTokenAccount(
         connection,
         keypair,
-        selectedToken,
+        mintPubkey,
         keypair.publicKey
       );
       setData({ state: "finish", account });
     } catch (e) {
-      setData({ state: "error" });
-    } finally {
-      // setData({
-      //   state: "ready",
-      // });
+      setData({ state: "error", error: e });
     }
-  }, [connection, keypair, selectedToken]);
+  }, [connection, keypair, mintPubkey]);
 
   return [data, createTokenAccount];
 }
